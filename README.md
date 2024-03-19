@@ -37,3 +37,7 @@ erDiagram
 
 ## Getting started
 
+1. `npm install`
+2. `cp .env.sample .env`
+3. `.env` 파일 편집
+4. `npm start:debug` 로 실행 및 DBMS 연동 테스트

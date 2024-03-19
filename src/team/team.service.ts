@@ -92,8 +92,6 @@ export class TeamService {
   // Player 관련 API
   // ===============================================
   async findAllPlayers(query: PaginationQueryDto) {
-    console.log('=============== findAllPlayers ===============');
-
     const { page = 1, page_size = 10, name, nickname } = query;
 
     const queryBuilder = this.playerRepository
@@ -106,7 +104,7 @@ export class TeamService {
     }
 
     if (nickname) {
-      queryBuilder.andWhere('player.nickName LIKE :nickname', {
+      queryBuilder.andWhere('player.nickname LIKE :nickname', {
         nickname: `%${nickname}%`,
       });
     }
@@ -116,8 +114,6 @@ export class TeamService {
   }
 
   async findPlayersByTeamId(teamId: number, query: PaginationQueryDto) {
-    console.log('=============== findPlayersByTeamId ===============');
-
     const { page = 1, page_size = 10, name, nickname } = query;
 
     const queryBuilder = this.playerRepository
@@ -131,7 +127,7 @@ export class TeamService {
     }
 
     if (nickname) {
-      queryBuilder.andWhere('player.nickName LIKE :nickname', {
+      queryBuilder.andWhere('player.nickname LIKE :nickname', {
         nickname: `%${nickname}%`,
       });
     }

@@ -32,7 +32,7 @@ async function createDummyData() {
         for (let j = 0; j < 5; j++) {
           const player = new Player();
           player.name = faker.person.fullName(); // 실제와 같은 이름 생성
-          player.nickName = faker.internet.userName(); // 인터넷 사용자 이름으로 닉네임 생성
+          player.nickname = faker.internet.userName(); // 인터넷 사용자 이름으로 닉네임 생성
           player.team = team;
           await AppDataSource.manager.save(player);
         }

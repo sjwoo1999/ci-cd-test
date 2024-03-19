@@ -19,7 +19,7 @@ export class Player {
   name: string;
 
   @Column({ type: 'varchar', nullable: false })
-  nickName: string;
+  nickname: string;
 
   @ManyToOne(() => Team, (team) => team.players)
   @JoinColumn({ name: 'team_id' })

@@ -22,11 +22,11 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamService } from './team.service';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
 
-@UseGuards(RolesGuard)
 @Controller('team')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
+  @UseGuards(RolesGuard)
   @Get()
   async findAll() {
     return await this.teamService.findAll();
@@ -37,6 +37,7 @@ export class TeamController {
   //   return await this.teamService.findOne(id);
   // }
 
+  @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Post()
   @UseInterceptors(FileInterceptor('file'))
@@ -44,12 +45,14 @@ export class TeamController {
     await this.teamService.create(file);
   }
 
+  @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Put(':id')
   async update(@Param('id') id: number, @Body() updateTeamDto: UpdateTeamDto) {
     await this.teamService.update(id, updateTeamDto);
   }
 
+  @UseGuards(RolesGuard)
   @Roles(Role.Admin)
   @Delete(':id')
   async delete(@Param('id') id: number) {
@@ -61,7 +64,6 @@ export class TeamController {
   // ===============================================
   @Get('/players')
   async findAllPlayers(@Query() paginationQuery: PaginationQueryDto) {
-    console.log('=============== findAllPlayers ===============');
     return await this.teamService.findAllPlayers(paginationQuery);
   }
 
@@ -70,7 +72,6 @@ export class TeamController {
     @Param('id') teamId: number,
     @Query() paginationQuery: PaginationQueryDto,
   ) {
-    console.log('=============== findPlayersByTeamId ===============');
     return await this.teamService.findPlayersByTeamId(teamId, paginationQuery);
   }
 }
