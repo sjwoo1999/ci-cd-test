@@ -12,12 +12,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
+import { Player } from './entities/player.entity';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 
 @Injectable()
 export class TeamService {
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    @InjectRepository(Player)
+    private readonly playerRepository: Repository<Player>,
   ) {}
 
   async findAll(): Promise<Team[]> {
@@ -82,5 +86,57 @@ export class TeamService {
     }
 
     return team;
+  }
+
+  // ===============================================
+  // Player 관련 API
+  // ===============================================
+  async findAllPlayers(query: PaginationQueryDto) {
+    console.log('=============== findAllPlayers ===============');
+
+    const { page = 1, page_size = 10, name, nickname } = query;
+
+    const queryBuilder = this.playerRepository
+      .createQueryBuilder('player')
+      .skip((page - 1) * page_size)
+      .take(page_size);
+
+    if (name) {
+      queryBuilder.andWhere('player.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (nickname) {
+      queryBuilder.andWhere('player.nickName LIKE :nickname', {
+        nickname: `%${nickname}%`,
+      });
+    }
+
+    const players = await queryBuilder.getMany();
+    return players;
+  }
+
+  async findPlayersByTeamId(teamId: number, query: PaginationQueryDto) {
+    console.log('=============== findPlayersByTeamId ===============');
+
+    const { page = 1, page_size = 10, name, nickname } = query;
+
+    const queryBuilder = this.playerRepository
+      .createQueryBuilder('player')
+      .where('player.team_id = :team_id', { team_id: teamId })
+      .skip((page - 1) * page_size)
+      .take(page_size);
+
+    if (name) {
+      queryBuilder.andWhere('player.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (nickname) {
+      queryBuilder.andWhere('player.nickName LIKE :nickname', {
+        nickname: `%${nickname}%`,
+      });
+    }
+
+    const players = await queryBuilder.getMany();
+    return players;
   }
 }

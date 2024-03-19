@@ -12,19 +12,20 @@ import { SupportMessageModule } from './support-message/support-message.module';
 import { User } from './user/entities/user.entity';
 import { Team } from './team/entities/team.entity';
 import { SupportMessage } from './support-message/entities/support-message.entity';
+import { Player } from './team/entities/player.entity';
 
 const typeOrmModuleOptions = {
   useFactory: async (
     configService: ConfigService,
   ): Promise<TypeOrmModuleOptions> => ({
     namingStrategy: new SnakeNamingStrategy(),
-    type: 'sqlite',
-    // username: configService.get('DB_USERNAME'),
-    // password: configService.get('DB_PASSWORD'),
-    // host: configService.get('DB_HOST'),
-    // port: configService.get('DB_PORT'),
+    type: 'mysql',
+    username: configService.get('DB_USERNAME'),
+    password: configService.get('DB_PASSWORD'),
+    host: configService.get('DB_HOST'),
+    port: configService.get('DB_PORT'),
     database: configService.get('DB_NAME'),
-    entities: [User, Team, SupportMessage],
+    entities: [User, Team, Player, SupportMessage],
     synchronize: configService.get('DB_SYNC'),
     logging: true,
   }),
@@ -37,10 +38,10 @@ const typeOrmModuleOptions = {
       isGlobal: true,
       validationSchema: Joi.object({
         JWT_SECRET_KEY: Joi.string().required(),
-        // DB_USERNAME: Joi.string().required(),
-        // DB_PASSWORD: Joi.string().required(),
-        // DB_HOST: Joi.string().required(),
-        // DB_PORT: Joi.number().required(),
+        DB_USERNAME: Joi.string().required(),
+        DB_PASSWORD: Joi.string().required(),
+        DB_HOST: Joi.string().required(),
+        DB_PORT: Joi.number().required(),
         DB_NAME: Joi.string().required(),
         DB_SYNC: Joi.boolean().required(),
       }),
