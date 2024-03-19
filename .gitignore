@@ -1,6 +1,7 @@
 # CUSTOM
 mysql_data
 *.sqlite3
+report.json
 
 
 
