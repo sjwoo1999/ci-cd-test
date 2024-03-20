@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
 import { Player } from './entities/player.entity';
 import { PaginationQueryDto } from './dto/pagination-query.dto';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class TeamService {
@@ -22,6 +24,8 @@ export class TeamService {
     private readonly teamRepository: Repository<Team>,
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
+    @Inject(CACHE_MANAGER)
+    private cacheManager: Cache,
   ) {}
 
   async findAll(): Promise<Team[]> {
@@ -94,10 +98,9 @@ export class TeamService {
   async findAllPlayers(query: PaginationQueryDto) {
     const { page = 1, page_size = 10, name, nickname } = query;
 
-    const queryBuilder = this.playerRepository
-      .createQueryBuilder('player')
-      .skip((page - 1) * page_size)
-      .take(page_size);
+    const queryBuilder = this.playerRepository.createQueryBuilder('player');
+    // .skip((page - 1) * page_size)
+    // .take(page_size);
 
     if (name) {
       queryBuilder.andWhere('player.name LIKE :name', { name: `%${name}%` });
@@ -109,6 +112,20 @@ export class TeamService {
       });
     }
 
+    if (name && nickname) {
+      let searchAllPlayers = await this.cacheManager.get('searchAllPlayers'); // null
+      if (!searchAllPlayers) {
+        searchAllPlayers = await queryBuilder.getMany(); // ORM sql 실행
+        await this.cacheManager.set(
+          'searchAllPlayers',
+          searchAllPlayers,
+          1000 * 60 * 5, // TTL : 얼마나 살아있냐, ms
+        );
+      } else {
+        console.log('=========== cache hit! ===========');
+      }
+      return searchAllPlayers;
+    }
     const players = await queryBuilder.getMany();
     return players;
   }
@@ -134,5 +151,27 @@ export class TeamService {
 
     const players = await queryBuilder.getMany();
     return players;
+  }
+
+  /**
+   * 각 팀에 대한 플레이어 수와 지원 메시지 수를 반환
+   */
+  async getTeamStats() {
+    let stats = await this.cacheManager.get('teamStats');
+    if (!stats) {
+      // 캐시된 데이터가 없을 경우 데이터베이스에서 조회
+      stats = await this.teamRepository
+        .createQueryBuilder('team')
+        .leftJoinAndSelect('team.players', 'player')
+        .leftJoinAndSelect('team.supportMessages', 'supportMessage')
+        .select('team.id', 'id')
+        .addSelect('team.name', 'name')
+        .addSelect('COUNT(DISTINCT player.id)', 'playerCount')
+        .addSelect('COUNT(DISTINCT supportMessage.id)', 'supportMessageCount')
+        .groupBy('team.id')
+        .getRawMany(); // 데이터베이스에서 통계 계산하는 로직
+      await this.cacheManager.set('teamStats', stats);
+    }
+    return stats;
   }
 }

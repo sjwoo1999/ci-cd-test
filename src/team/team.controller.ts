@@ -74,4 +74,9 @@ export class TeamController {
   ) {
     return await this.teamService.findPlayersByTeamId(teamId, paginationQuery);
   }
+
+  @Get('/stats')
+  async getTeamStats() {
+    return await this.teamService.getTeamStats();
+  }
 }

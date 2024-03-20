@@ -13,6 +13,7 @@ import { User } from './user/entities/user.entity';
 import { Team } from './team/entities/team.entity';
 import { SupportMessage } from './support-message/entities/support-message.entity';
 import { Player } from './team/entities/player.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -47,6 +48,9 @@ const typeOrmModuleOptions = {
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmModuleOptions),
+    CacheModule.register({
+      isGlobal: true,
+    }),
     AuthModule,
     UserModule,
     TeamModule,
