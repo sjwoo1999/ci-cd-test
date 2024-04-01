@@ -25,7 +25,7 @@ jobs:
         run: npm ci
       - name: Run lint
         run: npm run lint
-```yaml
+
 test:
     needs: lint
     runs-on: ubuntu-latest
