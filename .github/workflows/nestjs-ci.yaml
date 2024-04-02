@@ -53,6 +53,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@v1.0.3
+          with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: whoami
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
