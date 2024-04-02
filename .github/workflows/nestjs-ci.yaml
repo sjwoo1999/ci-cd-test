@@ -51,14 +51,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Execute SSH Command
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: whoami
-
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: executing remote ssh commands using ssh key
