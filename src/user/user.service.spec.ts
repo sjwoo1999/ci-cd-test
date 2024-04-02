@@ -106,7 +106,7 @@ describe('UserService', () => {
     expect(updatedRole).toEqual('0');
     expect(userRepositoryMock.update).toHaveBeenCalledWith(
       { id: mockUser.id },
-      { role: '0  ' },
+      { role: '0' },
     );
   });
 
